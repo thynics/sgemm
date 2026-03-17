@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <string>
 
 #include <cuda_runtime.h>
@@ -36,6 +37,11 @@ struct RunResult {
   double max_abs_error = 0.0;
   double max_rel_error = 0.0;
   std::string selected_config = "stub";
+};
+
+struct ErrorStats {
+  double max_abs_error = 0.0;
+  double max_rel_error = 0.0;
 };
 
 inline std::string ToLower(std::string value) {
@@ -80,6 +86,11 @@ inline const char* ToString(KernelBackend backend) {
 }
 
 RunResult RunBenchmark(const GemmProblem& problem, const RunConfig& config);
+
+void ReferenceGemmCpu(const GemmProblem& problem, const float* a, const float* b,
+                      const float* c_in, float* c_out);
+ErrorStats ComputeErrorStats(const float* reference, const float* actual, std::size_t count,
+                             double rel_epsilon = 1e-6);
 
 cudaError_t LaunchSimtGemm(const GemmProblem& problem);
 cudaError_t LaunchWmmaGemm(const GemmProblem& problem);
